@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cron 表达式生成器</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        .cron-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .cron-container h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .cron-section {
+            margin-bottom: 20px;
+        }
+
+        .cron-section label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #34495e;
+        }
+
+        .cron-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .cron-btn {
+            padding: 8px 15px;
+            background-color: #ecf0f1;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .cron-btn:hover {
+            background-color: #d6eaf8;
+        }
+
+        .cron-btn.active {
+            background-color: #3498db;
+            color: white;
+            border-color: #2980b9;
+        }
+
+        .custom-option {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .custom-option span {
+            white-space: nowrap;
+        }
+
+        .custom-input, .specific-input {
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 50px;
+            text-align: center;
+        }
+
+        .specific-input {
+            width: 100px;
+        }
+
+        .cron-result {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+        }
+
+        .expression-display {
+            font-family: monospace;
+            font-size: 20px;
+            padding: 10px;
+            background-color: #2c3e50;
+            color: #fff;
+            border-radius: 4px;
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        .description {
+            color: #7f8c8d;
+            font-style: italic;
+            margin-bottom: 15px;
+        }
+
+        .copy-btn {
+            padding: 8px 15px;
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin: 0 auto;
+        }
+
+        .copy-btn:hover {
+            background-color: #27ae60;
+        }
+
+        .copy-btn i {
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+<div class="cron-container">
+    <h2>Cron 表达式生成器</h2>
+    <div class="cron-selector">
+        <div class="cron-section">
+            <label>分钟</label>
+            <div class="cron-options minute">
+                <button class="cron-btn active" data-value="*">每分钟</button>
+                <button class="cron-btn" data-value="0">整点</button>
+                <div class="custom-option">
+                    <span>每</span>
+                    <input type="number" min="1" max="59" value="5" class="custom-input">
+                    <span>分钟</span>
+                </div>
+                <div class="custom-option">
+                    <span>指定分钟:</span>
+                    <input type="text" placeholder="0,15,30,45" class="specific-input">
+                </div>
+            </div>
+        </div>
+
+        <div class="cron-section">
+            <label>小时</label>
+            <div class="cron-options hour">
+                <button class="cron-btn active" data-value="*">每小时</button>
+                <button class="cron-btn" data-value="0">午夜</button>
+                <div class="custom-option">
+                    <span>每</span>
+                    <input type="number" min="1" max="23" value="2" class="custom-input">
+                    <span>小时</span>
+                </div>
+                <div class="custom-option">
+                    <span>指定小时:</span>
+                    <input type="text" placeholder="9,12,18" class="specific-input">
+                </div>
+            </div>
+        </div>
+
+        <div class="cron-section">
+            <label>日</label>
+            <div class="cron-options day">
+                <button class="cron-btn active" data-value="*">每日</button>
+                <button class="cron-btn" data-value="1">每月1日</button>
+                <div class="custom-option">
+                    <span>每</span>
+                    <input type="number" min="1" max="31" value="7" class="custom-input">
+                    <span>天</span>
+                </div>
+                <div class="custom-option">
+                    <span>指定日期:</span>
+                    <input type="text" placeholder="1,15" class="specific-input">
+                </div>
+            </div>
+        </div>
+
+        <div class="cron-section">
+            <label>月</label>
+            <div class="cron-options month">
+                <button class="cron-btn active" data-value="*">每月</button>
+                <button class="cron-btn" data-value="1">1月</button>
+                <div class="custom-option">
+                    <span>每</span>
+                    <input type="number" min="1" max="12" value="3" class="custom-input">
+                    <span>个月</span>
+                </div>
+                <div class="custom-option">
+                    <span>指定月份:</span>
+                    <input type="text" placeholder="1,4,7,10" class="specific-input">
+                </div>
+            </div>
+        </div>
+
+        <div class="cron-section">
+            <label>星期</label>
+            <div class="cron-options weekday">
+                <button class="cron-btn active" data-value="*">每周</button>
+                <button class="cron-btn" data-value="1">周一</button>
+                <div class="custom-option">
+                    <span>每</span>
+                    <input type="number" min="1" max="7" value="2" class="custom-input">
+                    <span>天(周)</span>
+                </div>
+                <div class="custom-option">
+                    <span>指定星期:</span>
+                    <input type="text" placeholder="1,3,5" class="specific-input">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="cron-result">
+        <h3>生成的 Cron 表达式:</h3>
+        <div class="expression-display">* * * * *</div>
+        <div class="description">每分钟执行一次</div>
+        <button class="copy-btn">
+            <i class="fas fa-copy"></i> 复制表达式
+        </button>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // 获取所有元素
+        const cronBtns = document.querySelectorAll('.cron-btn');
+        const customInputs = document.querySelectorAll('.custom-input');
+        const specificInputs = document.querySelectorAll('.specific-input');
+        const expressionDisplay = document.querySelector('.expression-display');
+        const descriptionDisplay = document.querySelector('.description');
+        const copyBtn = document.querySelector('.copy-btn');
+
+        // 初始 cron 表达式各部分
+        let cronParts = ['*', '*', '*', '*', '*'];
+
+        // 更新 cron 表达式
+        function updateCronExpression() {
+            expressionDisplay.textContent = cronParts.join(' ');
+            updateDescription();
+        }
+
+        // 更新描述文本
+        function updateDescription() {
+            const [minute, hour, day, month, weekday] = cronParts;
+            let desc = '';
+
+            // 解析分钟
+            if (minute === '*') {
+                desc += '每分钟';
+            } else if (minute.includes('/')) {
+                const [, value] = minute.split('/');
+                desc += `每${value}分钟`;
+            } else if (minute.includes(',')) {
+                desc += `在分钟 ${minute}`;
+            } else {
+                desc += `在分钟 ${minute}`;
+            }
+
+            // 解析小时
+            if (hour === '*') {
+                desc += '的每小时';
+            } else if (hour.includes('/')) {
+                const [, value] = hour.split('/');
+                desc += `的每${value}小时`;
+            } else if (hour.includes(',')) {
+                desc += `的小时 ${hour}`;
+            } else {
+                desc += `的小时 ${hour}`;
+            }
+
+            // 解析日
+            if (day === '*') {
+                desc += '的每天';
+            } else if (day.includes('/')) {
+                const [, value] = day.split('/');
+                desc += `的每${value}天`;
+            } else if (day.includes(',')) {
+                desc += `的日期 ${day}`;
+            } else {
+                desc += `的日期 ${day}`;
+            }
+
+            // 解析月
+            if (month === '*') {
+                desc += '的每月';
+            } else if (month.includes('/')) {
+                const [, value] = month.split('/');
+                desc += `的每${value}个月`;
+            } else if (month.includes(',')) {
+                desc += `的月份 ${month}`;
+            } else {
+                desc += `的月份 ${month}`;
+            }
+
+            // 解析星期
+            if (weekday === '*') {
+                desc += '的每周';
+            } else if (weekday.includes('/')) {
+                const [, value] = weekday.split('/');
+                desc += `的每${value}天(周)`;
+            } else if (weekday.includes(',')) {
+                desc += `的星期 ${weekday}`;
+            } else {
+                desc += `的星期 ${weekday}`;
+            }
+
+            desc += '执行一次';
+            descriptionDisplay.textContent = desc;
+        }
+
+        // 处理按钮点击
+        cronBtns.forEach(btn => {
+            btn.addEventListener('click', function () {
+                // 获取按钮所属的部分 (minute, hour, day, month, weekday)
+                const section = this.closest('.cron-options').classList[1];
+                const value = this.getAttribute('data-value');
+
+                // 移除同组的 active 类
+                this.parentElement.querySelectorAll('.cron-btn').forEach(b => {
+                    b.classList.remove('active');
+                });
+
+                // 添加 active 类到当前按钮
+                this.classList.add('active');
+
+                // 更新对应的 cron 部分
+                let index;
+                switch (section) {
+                    case 'minute':
+                        index = 0;
+                        break;
+                    case 'hour':
+                        index = 1;
+                        break;
+                    case 'day':
+                        index = 2;
+                        break;
+                    case 'month':
+                        index = 3;
+                        break;
+                    case 'weekday':
+                        index = 4;
+                        break;
+                }
+
+                cronParts[index] = value;
+                updateCronExpression();
+            });
+        });
+
+        // 处理自定义输入
+        customInputs.forEach(input => {
+            input.addEventListener('change', function () {
+                const section = this.closest('.cron-options').classList[1];
+                const value = this.value;
+
+                let index;
+                switch (section) {
+                    case 'minute':
+                        index = 0;
+                        break;
+                    case 'hour':
+                        index = 1;
+                        break;
+                    case 'day':
+                        index = 2;
+                        break;
+                    case 'month':
+                        index = 3;
+                        break;
+                    case 'weekday':
+                        index = 4;
+                        break;
+                }
+
+                cronParts[index] = `*/${value}`;
+                updateCronExpression();
+            });
+        });
+
+        // 处理特定值输入
+        specificInputs.forEach(input => {
+            input.addEventListener('change', function () {
+                const section = this.closest('.cron-options').classList[1];
+                const value = this.value.trim();
+
+                if (value) {
+                    let index;
+                    switch (section) {
+                        case 'minute':
+                            index = 0;
+                            break;
+                        case 'hour':
+                            index = 1;
+                            break;
+                        case 'day':
+                            index = 2;
+                            break;
+                        case 'month':
+                            index = 3;
+                            break;
+                        case 'weekday':
+                            index = 4;
+                            break;
+                    }
+
+                    cronParts[index] = value;
+                    updateCronExpression();
+                }
+            });
+        });
+
+        // 复制功能
+        copyBtn.addEventListener('click', function () {
+            navigator.clipboard.writeText(expressionDisplay.textContent)
+                .then(() => {
+                    const originalText = this.innerHTML;
+                    this.innerHTML = '<i class="fas fa-check"></i> 已复制';
+                    setTimeout(() => {
+                        this.innerHTML = originalText;
+                    }, 2000);
+                })
+                .catch(err => {
+                    console.error('复制失败: ', err);
+                });
+        });
+
+        // 初始化
+        updateCronExpression();
+    });
+</script>
+</body>
+
+</html>
