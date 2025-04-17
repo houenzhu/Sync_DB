@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cron 表达式生成器</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/cron.css">
+    <script src="../js/cron.js"></script>
+</head>
+<body>
+<div class="cron-container">
+    <h2>Cron 表达式生成器</h2>
+    <div class="cron-selector">
+        <div class="cron-section">
+            <label>分钟</label>
+            <div class="cron-options minute">
+                <button class="cron-btn active" data-value="*">每分钟</button>
+                <button class="cron-btn" data-value="0">整点</button>
+                <div class="custom-option">
+                    <span>每</span>
+                    <input type="number" min="1" max="59" value="5" class="custom-input">
+                    <span>分钟</span>
+                </div>
+                <div class="custom-option">
+                    <span>指定分钟:</span>
+                    <input type="text" placeholder="0,15,30,45" class="specific-input">
+                </div>
+            </div>
+        </div>
+
+        <div class="cron-section">
+            <label>小时</label>
+            <div class="cron-options hour">
+                <button class="cron-btn active" data-value="*">每小时</button>
+                <button class="cron-btn" data-value="0">午夜</button>
+                <div class="custom-option">
+                    <span>每</span>
+                    <input type="number" min="1" max="23" value="2" class="custom-input">
+                    <span>小时</span>
+                </div>
+                <div class="custom-option">
+                    <span>指定小时:</span>
+                    <input type="text" placeholder="9,12,18" class="specific-input">
+                </div>
+            </div>
+        </div>
+
+        <div class="cron-section">
+            <label>日</label>
+            <div class="cron-options day">
+                <button class="cron-btn active" data-value="*">每日</button>
+                <button class="cron-btn" data-value="1">每月1日</button>
+                <div class="custom-option">
+                    <span>每</span>
+                    <input type="number" min="1" max="31" value="7" class="custom-input">
+                    <span>天</span>
+                </div>
+                <div class="custom-option">
+                    <span>指定日期:</span>
+                    <input type="text" placeholder="1,15" class="specific-input">
+                </div>
+            </div>
+        </div>
+
+        <div class="cron-section">
+            <label>月</label>
+            <div class="cron-options month">
+                <button class="cron-btn active" data-value="*">每月</button>
+                <button class="cron-btn" data-value="1">1月</button>
+                <div class="custom-option">
+                    <span>每</span>
+                    <input type="number" min="1" max="12" value="3" class="custom-input">
+                    <span>个月</span>
+                </div>
+                <div class="custom-option">
+                    <span>指定月份:</span>
+                    <input type="text" placeholder="1,4,7,10" class="specific-input">
+                </div>
+            </div>
+        </div>
+
+        <div class="cron-section">
+            <label>星期</label>
+            <div class="cron-options weekday">
+                <button class="cron-btn active" data-value="*">每周</button>
+                <button class="cron-btn" data-value="1">周一</button>
+                <div class="custom-option">
+                    <span>每</span>
+                    <input type="number" min="1" max="7" value="2" class="custom-input">
+                    <span>天(周)</span>
+                </div>
+                <div class="custom-option">
+                    <span>指定星期:</span>
+                    <input type="text" placeholder="1,3,5" class="specific-input">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="cron-result">
+        <h3>生成的 Cron 表达式:</h3>
+        <div class="expression-display">* * * * *</div>
+        <div class="description">每分钟执行一次</div>
+        <button class="copy-btn">
+            <i class="fas fa-copy"></i> 复制表达式
+        </button>
+    </div>
+</div>
+</body>
+
+</html>

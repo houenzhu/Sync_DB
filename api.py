@@ -3,8 +3,8 @@ from flask import request, jsonify
 from sqlalchemy import create_engine, text
 
 from runx import DataSource, db, SyncTask, scheduler, sync_executor, app, SyncLog
+from db_syncer.utils.engine import parse_cron
 from cron import PausableScheduler
-from utils.engine import parse_cron
 
 flask_cors.CORS(app)
 self_scheduler = PausableScheduler()
@@ -15,6 +15,7 @@ self_scheduler = PausableScheduler()
 def manage_datasource():
     """配置管理接口"""
     data = request.json
+    print("Received data:", request.json)
     new_ds = DataSource(
         name=data['name'],
         db_type=data['db_type'],
@@ -33,18 +34,45 @@ def manage_datasource():
 @app.route('/api/datasources', methods=['GET'])
 def get_datasources():
     """获取所有数据源"""
-    datasources = DataSource.query.all()
-    return jsonify([{
-        'id': ds.id,
-        'name': ds.name,
-        'db_type': ds.db_type,
-        'host': ds.host,
-        'port': ds.port,
-        'username': ds.username,
-        'database': ds.database,
-        'driver': ds.driver,
-        'created_at': ds.created_at.isoformat()
-    } for ds in datasources])
+    page = request.args.get('page', default=1, type=int)
+    page_size = request.args.get('pageSize', default=10, type=int)
+    db_type = request.args.get('dbType', default=None, type=str)
+    name = request.args.get('name', default=None, type=str)
+
+    # 构建查询
+    query = DataSource.query
+
+    # 添加数据源类型筛选
+    if db_type:
+        query = query.filter(DataSource.db_type == db_type)
+
+    # 添加名称模糊查询
+    if name:
+        query = query.filter(DataSource.name.like(f'%{name}%'))
+
+    # 计算分页信息
+    total_datasources = query.count()
+    total_pages = (total_datasources + page_size - 1) // page_size
+
+    # 获取分页数据
+    datasources = query.paginate(page=page, per_page=page_size, error_out=False).items
+
+    return jsonify({
+        'datasources': [{
+            'id': ds.id,
+            'name': ds.name,
+            'db_type': ds.db_type,
+            'host': ds.host,
+            'port': ds.port,
+            'username': ds.username,
+            'database': ds.database,
+            'driver': ds.driver,
+            'created_at': ds.created_at.isoformat()
+        } for ds in datasources],
+        'totalPages': total_pages,
+        'currentPage': page,
+        'totalDatasources': total_datasources
+    })
 
 
 @app.route('/api/datasources/<int:ds_id>', methods=['GET'])
@@ -112,36 +140,41 @@ def delete_datasource(ds_id):
 
 @app.route('/api/tasks', methods=['POST'])
 def schedule_task():
-    """任务调度接口"""
-    data = request.json
-    new_task = SyncTask(
-        name=data['name'],
-        cron=data['cron'],
-        source_id=data['source_id'],
-        source_table=data['source_table'],
-        target_id=data['target_id'],
-        target_table=data['target_table'],
-        column_map=data['column_map'],
-        filter_rule=data.get('filter_rule', '1=1')
-    )
-    db.session.add(new_task)
+    try:
+        """任务调度接口"""
+        data = request.json
+        print("Received task data:", data)  # 确保打印日志
+        new_task = SyncTask(
+            name=data['name'],
+            cron=data['cron'],
+            source_id=data['source_id'],
+            source_table=data['source_table'],
+            target_id=data['target_id'],
+            target_table=data['target_table'],
+            column_map=data['column_map'],
+            filter_rule=data.get('filter_rule', '1=1')
+        )
+        db.session.add(new_task)
+        db.session.commit()
+        print(f"New task ID: {new_task.id}")  # 确保打印日志
 
-    # 定时任务注册
-    # scheduler.add_job(
-    #     sync_executor,
-    #     'cron',
-    #     args=[new_task.id],
-    #     **parse_cron(data['cron'])
-    # )
-    db.session.commit()
-    print(f"new_task_id = {new_task.id}")
-    self_scheduler.add_job(
-        sync_executor,
-        new_task.id,
-        'cron',
-        **parse_cron(data['cron'])
-    )
-    return jsonify({"task_id": new_task.id}), 201
+        # 确保调度器已初始化
+        if not hasattr(self_scheduler, 'add_job'):
+            raise Exception("Scheduler is not properly initialized")
+
+        # 添加任务到调度器
+        self_scheduler.add_job(
+            sync_executor,
+            new_task.id,
+            'cron',
+            **parse_cron(data['cron'])
+        )
+        print(f"Task {new_task.id} added to scheduler")  # 确保打印日志
+
+        return jsonify({"task_id": new_task.id}), 201
+    except Exception as e:
+        print(f"Error in schedule_task: {e}")  # 确保打印日志
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route('/api/tasks', methods=['GET'])
@@ -307,9 +340,34 @@ def get_logs():
     """获取所有日志"""
     page = request.args.get('page', default=1, type=int)
     page_size = request.args.get('pageSize', default=10, type=int)
+    task_name = request.args.get('taskName', default=None, type=str)
+    task_status = request.args.get('taskStatus', default=None, type=str)
 
     # 添加排序功能，按时间倒序
     logs_query = SyncLog.query.order_by(SyncLog.start_time.desc())
+
+    # 定义查询策略
+    def query_by_name_and_status(logs_query, task_name, task_status):
+        if task_name and task_status:
+            # 先根据任务名称模糊查询任务ID
+            task_ids = [task.id for task in SyncTask.query.filter(SyncTask.name.like(f'%{task_name}%')).all()]
+            if task_ids:
+                return logs_query.filter(SyncLog.task_id.in_(task_ids), SyncLog.status == task_status)
+            else:
+                return logs_query.filter(SyncLog.status == task_status)
+        elif task_name:
+            task_ids = [task.id for task in SyncTask.query.filter(SyncTask.name.like(f'%{task_name}%')).all()]
+            if task_ids:
+                return logs_query.filter(SyncLog.task_id.in_(task_ids))
+            else:
+                return logs_query.filter(False)  # 如果没有匹配的任务，直接返回空结果
+        elif task_status:
+            return logs_query.filter(SyncLog.status == task_status)
+        else:
+            return logs_query
+
+    # 应用查询策略
+    logs_query = query_by_name_and_status(logs_query, task_name, task_status)
 
     # 计算分页信息
     total_logs = logs_query.count()

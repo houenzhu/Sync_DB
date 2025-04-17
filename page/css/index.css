@@ -513,17 +513,45 @@ header {
 }
 
 /* SQL 高亮样式 */
-.sql-keyword { color: #0077aa; font-weight: bold; }
-.sql-string { color: #d14; }
-.sql-number { color: #099; }
-.sql-function { color: #900; font-weight: bold; }
-.sql-comment { color: #998; font-style: italic; }
+.sql-keyword {
+    color: #0077aa;
+    font-weight: bold;
+}
+
+.sql-string {
+    color: #d14;
+}
+
+.sql-number {
+    color: #099;
+}
+
+.sql-function {
+    color: #900;
+    font-weight: bold;
+}
+
+.sql-comment {
+    color: #998;
+    font-style: italic;
+}
 
 /* JSON 高亮样式 */
-.json-key { color: #0077aa; }
-.json-string { color: #d14; }
-.json-number { color: #099; }
-.json-literal { color: #990073; }
+.json-key {
+    color: #0077aa;
+}
+
+.json-string {
+    color: #d14;
+}
+
+.json-number {
+    color: #099;
+}
+
+.json-literal {
+    color: #990073;
+}
 
 /* 代码块样式 */
 pre code {
@@ -532,4 +560,236 @@ pre code {
     background: #f5f5f5;
     border-radius: 4px;
     overflow-x: auto;
+}
+
+/* 新增搜索框和按钮样式 */
+/* 状态筛选下拉框样式 */
+.status-select {
+    padding: 10px 15px;
+    border: 2px solid var(--primary-color);
+    border-radius: 20px;
+    font-size: 14px;
+    color: var(--dark-color);
+    background-color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    outline: none;
+    appearance: none; /* 移除默认样式 */
+    -webkit-appearance: none; /* 移除默认样式 */
+    -moz-appearance: none; /* 移除默认样式 */
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233498db' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 12px;
+}
+
+.status-select:focus {
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 8px rgba(46, 204, 113, 0.3);
+}
+
+.status-select:hover {
+    background-color: var(--light-color);
+}
+
+.datasource-search-container {
+    display: flex;
+    gap: 8px;
+    max-width: 600px;
+    margin: auto; /* 居右放置 */
+    align-items: center;
+}
+
+/* 调整搜索容器的布局 */
+.search-container {
+    display: flex;
+    gap: 8px;
+    max-width: 600px;
+    margin-left: auto; /* 居右放置 */
+    align-items: center;
+}
+
+.status-select {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    color: var(--dark-color);
+    background-color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 12px;
+    min-width: 120px;
+}
+
+.status-select:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
+}
+
+.status-select:hover {
+    border-color: #ccc;
+}
+
+.search-input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    outline: none;
+    min-width: 200px;
+}
+
+.search-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
+}
+
+.search-btn {
+    padding: 8px 16px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-btn:hover {
+    background-color: #2980b9;
+}
+
+/* 下拉选项框样式 */
+.status-select option {
+    padding: 8px 12px;
+    background-color: white;
+    color: var(--dark-color);
+    transition: background-color 0.2s ease;
+}
+
+.status-select option:hover {
+    background-color: var(--light-color);
+}
+
+.status-select option:checked {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* 下拉框的选项容器样式 */
+.status-select {
+    position: relative;
+}
+
+.status-select::after {
+    content: '';
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 4px solid #333;
+    pointer-events: none;
+}
+
+/* 下拉框展开时的样式 */
+.status-select:focus {
+    border-radius: 4px 4px 0 0;
+}
+
+.status-select option {
+    border-radius: 0;
+}
+
+.status-select option:last-child {
+    border-radius: 0 0 4px 4px;
+}
+
+/* 下拉菜单样式 */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-toggle {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.dropdown-toggle:hover {
+    background-color: #2980b9;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1000;
+    display: none;
+    float: left;
+    min-width: 160px;
+    padding: 5px 0;
+    margin: 2px 0 0;
+    font-size: 14px;
+    color: #333;
+    text-align: left;
+    list-style: none;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid rgba(0,0,0,.15);
+    border-radius: 4px;
+    box-shadow: 0 6px 12px rgba(0,0,0,.175);
+}
+
+.dropdown-menu.show {
+    display: block;
+}
+
+.dropdown-item {
+    display: block;
+    width: 100%;
+    padding: 5px 15px;
+    clear: both;
+    font-weight: 400;
+    color: #333;
+    text-align: inherit;
+    white-space: nowrap;
+    background-color: transparent;
+    border: 0;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+.dropdown-item.text-danger {
+    color: var(--danger-color);
+}
+
+.dropdown-item.text-danger:hover {
+    background-color: #f8d7da;
 }

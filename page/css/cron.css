@@ -1,0 +1,131 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f7fa;
+    margin: 0;
+    padding: 20px;
+    color: #333;
+}
+
+.cron-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: white;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.cron-container h2 {
+    color: #2c3e50;
+    margin-top: 0;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.cron-section {
+    margin-bottom: 20px;
+}
+
+.cron-section label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #34495e;
+}
+
+.cron-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.cron-btn {
+    padding: 8px 15px;
+    background-color: #ecf0f1;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 14px;
+}
+
+.cron-btn:hover {
+    background-color: #d6eaf8;
+}
+
+.cron-btn.active {
+    background-color: #3498db;
+    color: white;
+    border-color: #2980b9;
+}
+
+.custom-option {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+}
+
+.custom-option span {
+    white-space: nowrap;
+}
+
+.custom-input, .specific-input {
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 50px;
+    text-align: center;
+}
+
+.specific-input {
+    width: 100px;
+}
+
+.cron-result {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+}
+
+.expression-display {
+    font-family: monospace;
+    font-size: 20px;
+    padding: 10px;
+    background-color: #2c3e50;
+    color: #fff;
+    border-radius: 4px;
+    margin: 10px 0;
+    text-align: center;
+}
+
+.description {
+    color: #7f8c8d;
+    font-style: italic;
+    margin-bottom: 15px;
+}
+
+.copy-btn {
+    padding: 8px 15px;
+    background-color: #2ecc71;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin: 0 auto;
+}
+
+.copy-btn:hover {
+    background-color: #27ae60;
+}
+
+.copy-btn i {
+    font-size: 14px;
+}

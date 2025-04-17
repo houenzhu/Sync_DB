@@ -11,9 +11,9 @@ logging.basicConfig()
 logging.getLogger('apscheduler').setLevel(logging.DEBUG)
 
 # Redis配置
-REDIS_HOST = '192.168.56.100'
+REDIS_HOST = 'localhost'
 REDIS_PORT = 6379
-REDIS_DB = 2
+REDIS_DB = 0
 REDIS_PASSWORD = None
 
 # 初始化Redis连接
@@ -56,6 +56,7 @@ class PausableScheduler:
         print(f"初始化完成: {jobstores}")
 
     def add_job(self, func, job_id, trigger, **trigger_args):
+        print(f"添加任务")
         """添加任务"""
         # 初始状态设为运行中
         r.set(f"{TASK_STATUS_PREFIX}{job_id}", "running")

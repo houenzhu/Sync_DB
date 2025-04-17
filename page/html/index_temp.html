@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据同步平台</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="../css/index.css">
+    <script src="../js/jquery-3.7.1.min.js"></script>
+    <script src="../js/index_temp.js"></script>
+</head>
+<body>
+<header>
+    <div class="container header-content">
+        <div class="logo">
+            <i class="fas fa-sync-alt"></i> 数据同步平台
+        </div>
+        <div>
+            <span class="badge badge-primary">v1.0.0</span>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    <div class="main-content">
+        <aside class="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="#" class="active" data-page="dashboard"><i class="fas fa-tachometer-alt"></i> 仪表盘</a>
+                </li>
+                <li><a href="#" data-page="datasources"><i class="fas fa-database"></i> 数据源管理</a></li>
+                <li><a href="#" data-page="tasks"><i class="fas fa-tasks"></i> 同步任务</a></li>
+                <li><a href="#" data-page="logs"><i class="fas fa-clipboard-list"></i> 执行日志</a></li>
+                <li><a href="#" data-page="settings"><i class="fas fa-cog"></i> 系统设置</a></li>
+            </ul>
+        </aside>
+
+        <main class="content-area">
+            <!-- 仪表盘页面 -->
+            <div id="dashboard-page" class="page">
+                <div class="page-header">
+                    <h2 class="page-title"><i class="fas fa-tachometer-alt"></i> 仪表盘</h2>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-title">数据源总数</div>
+                        <div class="stat-data">
+                            <div class="stat-icon"><i class="fas fa-database"></i></div>
+                            <div class="stat-value" id="total-datasources">0</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-title">同步任务数</div>
+                        <div class="stat-data">
+                            <div class="stat-icon"><i class="fas fa-tasks"></i></div>
+                            <div class="stat-value" id="total-tasks">0</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-title">今日执行</div>
+                        <div class="stat-data">
+                            <div class="stat-icon"><i class="fas fa-play-circle"></i></div>
+                            <div class="stat-value" id="today-runs">0</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-title">系统状态</div>
+                        <div class="stat-data">
+                            <div class="stat-icon"><i class="fas fa-heartbeat"></i></div>
+                            <div class="stat-value" id="system-status">正常</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recent-tasks mt-3">
+                    <h3 class="mb-3">最近执行的任务</h3>
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>任务名称</th>
+                            <th>执行时间</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody id="recent-tasks-list">
+                        <!-- 动态加载 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 数据源管理页面 -->
+            <div id="datasources-page" class="page" style="display: none;">
+                <div class="page-header">
+                    <h2 class="page-title"><i class="fas fa-database"></i> 数据源管理</h2>
+                    <div class="datasource-search-container">
+                        <input type="text" id="datasource-search-input" placeholder="输入数据源名称..." class="search-input">
+                        <select id="datasource-type-select" class="status-select">
+                            <option value="">所有类型</option>
+                            <option value="mysql">MySQL</option>
+                            <option value="sqlserver">SQL Server</option>
+                            <option value="postgresql">PostgreSQL</option>
+                            <option value="oracle">Oracle</option>
+                        </select>
+                        <button id="datasource-search-btn" class="search-btn"><i class="fas fa-search"></i></button>
+                    </div>
+                    <button class="btn btn-secondary" id="add-datasource-btn"><i class="fas fa-plus"></i> 添加数据源
+                    </button>
+                </div>
+
+                <div class="alert alert-success" id="datasource-success-alert" style="display: none;"></div>
+                <div class="alert alert-danger" id="datasource-error-alert" style="display: none;"></div>
+
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>名称</th>
+                        <th>类型</th>
+                        <th>主机</th>
+                        <th>数据库</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody id="datasources-list">
+                    <!-- 动态加载 -->
+                    </tbody>
+                </table>
+                <div id="datasources-pagination"></div>
+            </div>
+
+            <!-- 同步任务页面 -->
+            <div id="tasks-page" class="page" style="display: none;">
+                <div class="page-header">
+                    <h2 class="page-title"><i class="fas fa-tasks"></i> 同步任务</h2>
+                    <button class="btn btn-secondary" id="add-task-btn"><i class="fas fa-plus"></i> 添加任务</button>
+                </div>
+
+                <div class="alert alert-success" id="task-success-alert" style="display: none;"></div>
+                <div class="alert alert-danger" id="task-error-alert" style="display: none;"></div>
+
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>任务名称</th>
+                        <th>调度周期</th>
+                        <th>源数据源</th>
+                        <th>目标数据源</th>
+                        <th>最后执行</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody id="tasks-list">
+                        <!-- 动态加载 -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 执行日志页面 -->
+            <div id="logs-page" class="page" style="display: none;">
+                <div class="page-header">
+                    <h2 class="page-title"><i class="fas fa-clipboard-list"></i> 执行日志</h2>
+                    <!-- 在日志页面的搜索框旁边添加状态筛选控件 -->
+                    <div class="search-container">
+                        <input type="text" id="log-search-input" placeholder="输入任务名称进行搜索..."
+                               class="search-input">
+                        <select id="log-status-select" class="status-select">
+                            <option value="">所有状态</option>
+                            <option value="success">成功</option>
+                            <option value="failed">失败</option>
+                            <option value="running">运行中</option>
+                        </select>
+                        <button id="log-search-btn" class="search-btn"><i class="fas fa-search"></i></button>
+                    </div>
+                </div>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>任务名称</th>
+                        <th>执行时间</th>
+                        <th>持续时间</th>
+                        <th>状态</th>
+                        <th>记录数</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody id="logs-list">
+                    <!-- 动态加载 -->
+                    </tbody>
+                </table>
+                <div id="logs-pagination"></div>
+            </div>
+
+            <!-- 系统设置页面 -->
+            <div id="settings-page" class="page" style="display: none;">
+                <div class="page-header">
+                    <h2 class="page-title"><i class="fas fa-cog"></i> 系统设置</h2>
+                </div>
+
+                <div class="alert alert-success" id="settings-success-alert" style="display: none;"></div>
+
+                <form id="settings-form">
+                    <div class="form-group">
+                        <label for="system-name">系统名称</label>
+                        <input type="text" class="form-control" id="system-name" value="数据同步平台">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="log-retention">日志保留天数</label>
+                        <input type="number" class="form-control" id="log-retention" value="30">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="max-parallel">最大并行任务数</label>
+                        <input type="number" class="form-control" id="max-parallel" value="5">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="notification-email">通知邮箱</label>
+                        <input type="email" class="form-control" id="notification-email"
+                               placeholder="接收通知的邮箱地址">
+                    </div>
+
+                    <div class="text-right mt-3">
+                        <button type="submit" class="btn">保存设置</button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- 添加/编辑数据源模态框 -->
+<div id="datasource-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title" id="datasource-modal-title">添加数据源</h3>
+            <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="datasource-form">
+                <input type="hidden" id="datasource-id">
+
+                <div class="form-group">
+                    <label for="datasource-name">名称 *</label>
+                    <input type="text" class="form-control" id="datasource-name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="datasource-type">数据库类型 *</label>
+                    <select class="form-control" id="datasource-type" required>
+                        <option value="">-- 请选择 --</option>
+                        <option value="mysql">MySQL</option>
+                        <option value="sqlserver">SQL Server</option>
+                        <option value="postgresql">PostgreSQL</option>
+                        <option value="oracle">Oracle</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="datasource-host">主机地址 *</label>
+                    <input type="text" class="form-control" id="datasource-host"
+                           placeholder="例如: localhost 或 192.168.1.100" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="datasource-port">端口 *</label>
+                    <input type="number" class="form-control" id="datasource-port" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="datasource-username">用户名 *</label>
+                    <input type="text" class="form-control" id="datasource-username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="datasource-password">密码 *</label>
+                    <input type="password" class="form-control" id="datasource-password" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="datasource-database">数据库名称 *</label>
+                    <input type="text" class="form-control" id="datasource-database" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="datasource-driver">驱动类型</label>
+                    <input type="text" class="form-control" id="datasource-driver" placeholder="例如: pymysql, pyodbc">
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="test-connection-btn">测试连接</button>
+                    <button type="submit" class="btn" id="save-connection-btn">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 添加/编辑任务模态框 -->
+<div id="task-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title" id="task-modal-title">添加同步任务</h3>
+            <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="task-form">
+                <input type="hidden" id="task-id">
+
+                <div class="form-group">
+                    <label for="task-name">任务名称 *</label>
+                    <input type="text" class="form-control" id="task-name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="task-cron">调度周期 (Cron表达式) *</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="task-cron" placeholder="例如: 0 0 * * * (每天零点)"
+                               required>
+                        <div class="input-group-append">
+                            <a href="cron.html" target="_blank" class="btn btn-outline-secondary"
+                               id="cron-selector-link">选择Cron表达式</a>
+                        </div>
+                    </div>
+                    <small class="text-muted">使用标准的Cron表达式格式: 分 时 日 月 周</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="task-source">源数据源 *</label>
+                    <select class="form-control" id="task-source" required>
+                        <option value="">-- 请选择 --</option>
+                        <!-- 动态加载 -->
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="task-target">目标数据源 *</label>
+                    <select class="form-control" id="task-target" required>
+                        <option value="">-- 请选择 --</option>
+                        <!-- 动态加载 -->
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="source-table">源表名 *</label>
+                    <input type="text" class="form-control" id="source-table" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="target-table">目标表名 *</label>
+                    <input type="text" class="form-control" id="target-table" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="task-column-map">字段映射 (JSON格式) *</label>
+                    <textarea class="form-control" id="task-column-map" rows="4" required>
+                        {
+                          "dept_name": "dept_name",
+                          "dept_no": "dept_no",
+                          "id": "id"
+                        }
+                    </textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="task-filter">过滤条件</label>
+                    <input type="text" class="form-control" id="task-filter" placeholder="例如: status = 'active'">
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 执行日志详情模态框 -->
+<div id="log-detail-modal" class="modal">
+    <div class="modal-content" style="max-width: 800px;">
+        <div class="modal-header">
+            <h3 class="modal-title"><i class="fas fa-file-alt"></i> 任务执行详情</h3>
+            <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <!-- 基本信息卡片 -->
+            <div class="log-summary-card">
+                <div class="log-summary-header">
+                    <h4><i class="fas fa-info-circle"></i> 基本信息</h4>
+                    <span class="badge" id="log-status-badge">成功</span>
+                </div>
+                <div class="log-summary-grid">
+                    <div class="log-summary-item">
+                        <label>任务名称:</label>
+                        <span id="log-task-name" class="text-primary">-</span>
+                    </div>
+                    <div class="log-summary-item">
+                        <label>任务ID:</label>
+                        <span id="log-task-id">-</span>
+                    </div>
+                    <div class="log-summary-item">
+                        <label>开始时间:</label>
+                        <span id="log-start-time">-</span>
+                    </div>
+                    <div class="log-summary-item">
+                        <label>结束时间:</label>
+                        <span id="log-end-time">-</span>
+                    </div>
+                    <div class="log-summary-item">
+                        <label>持续时间:</label>
+                        <span id="log-duration">-</span>
+                    </div>
+                    <div class="log-summary-item">
+                        <label>处理记录数:</label>
+                        <span id="log-record-count">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 执行详情卡片 -->
+            <div class="log-details-card">
+                <div class="log-details-header">
+                    <h4><i class="fas fa-list-alt"></i> 执行详情</h4>
+                </div>
+                <div class="log-details-content">
+                    <pre id="log-details"><code>加载中...</code></pre>
+                </div>
+            </div>
+
+            <!-- 错误信息卡片（仅在出错时显示） -->
+            <div class="log-error-card" id="log-error-section" style="display: none;">
+                <div class="log-error-header">
+                    <h4><i class="fas fa-exclamation-triangle"></i> 错误信息</h4>
+                </div>
+                <div class="log-error-content">
+                    <pre id="log-error-message">加载中...</pre>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="close-log-detail">
+                <i class="fas fa-times"></i> 关闭
+            </button>
+            <button type="button" class="btn" id="copy-log-details">
+                <i class="fas fa-copy"></i> 复制详情
+            </button>
+        </div>
+    </div>
+</div>
